@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouthVoice Portal - Community Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>YouthVoice Portal</h1>
+            <p>Empowering 300+ club members to voice concerns, vote on priorities, and track change.</p>
+            <nav>
+                <a href="/" class="active">Dashboard & Priorities</a>
+                <a href="/submit" class="btn-nav">Submit New Issue</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="intro-box">
+            <h2>Active Community Priorities</h2>
+            <p>Review current issues submitted by club members, vote on what matters most, and track project progress.</p>
+        </section>
+
+        <section id="issues-container" class="grid">
+            <!-- Dynamic issues will load here via JavaScript -->
+            <p class="loading">Loading community issues...</p>
+        </section>
+    </main>
+
+    <script>
+        async function fetchIssues() {
+            try {
+                const response = await fetch('/api/issues');
+                const issues = await response.json();
+                const container = document.getElementById('issues-container');
+                
+                if (issues.length === 0) {
+                    container.innerHTML = `<p class="no-data">No community issues submitted yet. Be the first to submit one!</p>`;
+                    return;
+                }
+
+                container.innerHTML = '';
+                issues.forEach(issue => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span class="badge">${issue.category}</span>
+                            <span class="status status-${issue.status.toLowerCase()}">${issue.status}</span>
+                        </div>
+                        <h3>${issue.title}</h3>
+                        <p>${issue.description}</p>
+                        <div class="card-footer">
+                            <button onclick="vote(${issue.id})" class="vote-btn">👍 Vote (${issue.votes})</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error fetching issues:', error);
+            }
+        }
+
+        async function vote(id) {
+            await fetch(`/api/issues/${id}/vote`, { method: 'POST' });
+            fetchIssues();
+        }
+
+        fetchIssues();
+    </script>
+</body>
+</html>
