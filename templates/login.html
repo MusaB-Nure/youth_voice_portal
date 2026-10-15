@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - YouthVoice Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container" style="padding: 20px; max-width: 400px; margin: auto; margin-top: 50px;">
+        <h2>Login to YouthVoice</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul style="color: red; list-style-type: none; padding: 0;">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div style="margin-bottom: 15px;">
+                <label>Username:</label><br>
+                <input type="text" name="username" required style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Password:</label><br>
+                <input type="password" name="password" required style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+            <button type="submit" style="padding: 10px 20px; cursor: pointer;">Log In</button>
+        </form>
+
+        <!-- Place the Forgot Password link right here -->
+        <p style="margin-top: 15px;"><a href="{{ url_for('reset_password') }}">Forgot Password?</a></p>
+        
+        <p style="margin-top: 10px;">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+    </div>
+</body>
+</html>

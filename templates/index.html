@@ -2,74 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouthVoice Portal - Community Dashboard</title>
+    <title>YouthVoice Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <div class="container">
+    <div class="container" style="max-width: 600px; margin: auto; padding: 20px;">
+        <!-- Navigation Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h1>YouthVoice Portal</h1>
-            <p>Empowering 300+ club members to voice concerns, vote on priorities, and track change.</p>
-            <nav>
-                <a href="/" class="active">Dashboard & Priorities</a>
-                <a href="/submit" class="btn-nav">Submit New Issue</a>
-            </nav>
+            <div>
+                {% if current_user.is_authenticated %}
+                    <span>Hello, <strong>{{ current_user.username }}</strong>!</span> |
+                    <a href="{{ url_for('submit') }}">Submit Idea</a> |
+                    <a href="{{ url_for('logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}">Login</a> |
+                    <a href="{{ url_for('register') }}">Register</a>
+                {% endif %}
+            </div>
         </div>
-    </header>
 
-    <main class="container">
-        <section class="intro-box">
-            <h2>Active Community Priorities</h2>
-            <p>Review current issues submitted by club members, vote on what matters most, and track project progress.</p>
-        </section>
-
-        <section id="issues-container" class="grid">
-            <!-- Dynamic issues will load here via JavaScript -->
-            <p class="loading">Loading community issues...</p>
-        </section>
-    </main>
-
-    <script>
-        async function fetchIssues() {
-            try {
-                const response = await fetch('/api/issues');
-                const issues = await response.json();
-                const container = document.getElementById('issues-container');
+        <h2>Community Suggestions</h2>
+        {% for suggestion in suggestions %}
+            <div class="card" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background: #f9f9f9;">
+                <h3>{{ suggestion.title }}</h3>
+                <p>{{ suggestion.description }}</p>
+                <small>Posted by: <strong>{{ suggestion.author.username if suggestion.author else 'Anonymous' }}</strong></small>
                 
-                if (issues.length === 0) {
-                    container.innerHTML = `<p class="no-data">No community issues submitted yet. Be the first to submit one!</p>`;
-                    return;
-                }
+                <!-- Vote Form -->
+                <form action="{{ url_for('vote', id=suggestion.id) }}" method="POST" style="margin-top: 10px;">
+                    <button type="submit">👍 Vote ({{ suggestion.votes }})</button>
+                </form>
 
-                container.innerHTML = '';
-                issues.forEach(issue => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `
-                        <div class="card-header">
-                            <span class="badge">${issue.category}</span>
-                            <span class="status status-${issue.status.toLowerCase()}">${issue.status}</span>
+                <hr style="margin: 15px 0;">
+
+                <!-- Display Comments -->
+                <h4>Discussion & Comments</h4>
+                {% if suggestion.comments %}
+                    {% for comment in suggestion.comments %}
+                        <div style="background: #fff; padding: 8px; margin-bottom: 8px; border-radius: 4px; border-left: 3px solid #007BFF;">
+                            <p style="margin: 0; font-size: 14px;">{{ comment.body }}</p>
+                            <small style="color: #666; font-size: 11px;">— {{ comment.author.username }}</small>
                         </div>
-                        <h3>${issue.title}</h3>
-                        <p>${issue.description}</p>
-                        <div class="card-footer">
-                            <button onclick="vote(${issue.id})" class="vote-btn">👍 Vote (${issue.votes})</button>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (error) {
-                console.error('Error fetching issues:', error);
-            }
-        }
+                    {% endfor %}
+                {% else %}
+                    <p style="font-size: 13px; color: #777;">No comments yet. Be the first to join the discussion!</p>
+                {% endif %}
 
-        async function vote(id) {
-            await fetch(`/api/issues/${id}/vote`, { method: 'POST' });
-            fetchIssues();
-        }
-
-        fetchIssues();
-    </script>
+                <!-- Add Comment Form -->
+                {% if current_user.is_authenticated %}
+                    <form action="{{ url_for('add_comment', suggestion_id=suggestion.id) }}" method="POST" style="margin-top: 10px; display: flex; gap: 5px;">
+                        <input type="text" name="body" placeholder="Write a comment..." required style="flex: 1; padding: 6px;">
+                        <button type="submit" style="padding: 6px 12px; cursor: pointer;">Comment</button>
+                    </form>
+                {% else %}
+                    <p style="font-size: 12px; margin-top: 5px;"><a href="{{ url_for('login') }}">Log in</a> to join the discussion.</p>
+                {% endif %}
+            </div>
+        {% else %}
+            <p>No suggestions yet!</p>
+        {% endfor %}
+    </div>
 </body>
 </html>

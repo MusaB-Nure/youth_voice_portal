@@ -2,70 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Submit an Issue - YouthVoice Portal</title>
+    <title>Submit Concern - YouthVoice Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>YouthVoice Portal</h1>
-            <p>Share a challenge affecting young people in your community.</p>
-            <nav>
-                <a href="/">Dashboard & Priorities</a>
-                <a href="/submit" class="active btn-nav">Submit New Issue</a>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container form-container">
+    <div class="container" style="max-width: 500px; margin: auto; padding: 20px;">
         <h2>Submit a Community Concern</h2>
-        <form id="issue-form">
-            <div class="form-group">
-                <label for="title">Issue Title:</label>
-                <input type="text" id="title" required placeholder="e.g., Limited access to study space">
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul style="color: red; list-style-type: none; padding: 0;">
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('submit') }}">
+            <div style="margin-bottom: 15px;">
+                <label><strong>Issue Title:</strong></label><br>
+                <input type="text" name="title" required placeholder="e.g., Limited access to study space" style="width: 100%; padding: 8px; margin-top: 5px;">
             </div>
 
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select id="category">
-                    <option value="Education">Education & Resources</option>
-                    <option value="Environment">Environment & Cleanliness</option>
-                    <option value="Inclusion">Inclusion & Accessibility</option>
-                    <option value="Public Speaking">Youth Participation</option>
+            <div style="margin-bottom: 15px;">
+                <label><strong>Category:</strong></label><br>
+                <select name="category" style="width: 100%; padding: 8px; margin-top: 5px;">
+                    <option value="Education & Resources">Education & Resources</option>
+                    <option value="Environment & Community">Environment & Community</option>
+                    <option value="Sports & Youth Events">Sports & Youth Events</option>
+                    <option value="General Initiative">General Initiative</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="description">Description & Details:</label>
-                <textarea id="description" rows="5" required placeholder="Describe the problem and who it affects..."></textarea>
+            <div style="margin-bottom: 15px;">
+                <label><strong>Description & Details:</strong></label><br>
+                <textarea name="description" required rows="5" placeholder="Describe the problem and who it affects..." style="width: 100%; padding: 8px; margin-top: 5px;"></textarea>
             </div>
 
-            <button type="submit" class="submit-btn">Submit Issue</button>
+            <button type="submit" style="padding: 10px 20px; cursor: pointer; background-color: #3b7a78; color: white; border: none; border-radius: 4px; width: 100%;">Submit Issue</button>
         </form>
-        <p id="response-message"></p>
-    </main>
-
-    <script>
-        document.getElementById('issue-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('title').value;
-            const category = document.getElementById('category').value;
-            const description = document.getElementById('description').value;
-
-            const response = await fetch('/api/issues', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, category, description })
-            });
-
-            if (response.ok) {
-                document.getElementById('response-message').innerHTML = "✅ Issue submitted successfully! Redirecting...";
-                setTimeout(() => window.location.href = '/', 1500);
-            } else {
-                document.getElementById('response-message').innerHTML = "❌ Error submitting issue. Try again.";
-            }
-        });
-    </script>
+        <p style="margin-top: 15px;"><a href="{{ url_for('index') }}">← Back to Dashboard</a></p>
+    </div>
 </body>
 </html>
