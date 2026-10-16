@@ -2,39 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - YouthVoice Portal</title>
+    <title>Member Login - YouthVoice Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="container" style="padding: 20px; max-width: 400px; margin: auto; margin-top: 50px;">
-        <h2>Login to YouthVoice</h2>
-        
+<body style="background: var(--bg-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="auth-box">
+        <h2>Welcome Back ⚡</h2>
+        <p class="subtitle">Log in to access your youth club dashboard.</p>
+
         {% with messages = get_flashed_messages() %}
           {% if messages %}
-            <ul style="color: red; list-style-type: none; padding: 0;">
-              {% for message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; color: #991b1b; padding: 10px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 16px;">
+              {% for message in messages %}{{ message }}{% endfor %}
+            </div>
           {% endif %}
         {% endwith %}
 
         <form method="POST">
-            <div style="margin-bottom: 15px;">
-                <label>Username:</label><br>
-                <input type="text" name="username" required style="width: 100%; padding: 8px; margin-top: 5px;">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" name="username" required class="form-control" placeholder="Enter your username">
             </div>
-            <div style="margin-bottom: 15px;">
-                <label>Password:</label><br>
-                <input type="password" name="password" required style="width: 100%; padding: 8px; margin-top: 5px;">
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" name="password" required class="form-control" placeholder="••••••••">
             </div>
-            <button type="submit" style="padding: 10px 20px; cursor: pointer;">Log In</button>
+            <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer; padding: 12px;">Sign In</button>
         </form>
 
-        <!-- Place the Forgot Password link right here -->
-        <p style="margin-top: 15px;"><a href="{{ url_for('reset_password') }}">Forgot Password?</a></p>
-        
-        <p style="margin-top: 10px;">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        <div style="margin-top: 20px; font-size: 0.85rem; color: var(--text-muted);">
+            <p><a href="{{ url_for('reset_password') }}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Forgot password?</a></p>
+            <p style="margin-top: 8px;">Don't have an account? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 700; text-decoration: none;">Register here</a></p>
+            <p style="margin-top: 12px;"><a href="{{ url_for('index') }}" style="color: #94a3b8; text-decoration: none;">← Back to Home</a></p>
+        </div>
     </div>
 </body>
 </html>
