@@ -13,17 +13,26 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# ==========================================
+# CLUB ADMINISTRATORS LIST
+# Add any member username here to grant them 
+# full admin and project status control!
+# ==========================================
+ADMIN_USERNAMES = ['musa', 'co_leader_username', 'another_leader']
+
 # Database Models
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
 
 class Suggestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), nullable=False, default='General')
+    status = db.Column(db.String(50), nullable=False, default='Under Review')
     votes = db.Column(db.Integer, default=0)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
@@ -80,11 +89,19 @@ def register():
             flash('Username already exists.')
             return redirect(url_for('register'))
             
+        # Automatically check if the registered username is in our ADMIN_USERNAMES list
+        is_admin = (username.lower() in [admin.lower() for admin in ADMIN_USERNAMES])
+        
         hashed_password = generate_password_hash(password, method='scrypt')
-        new_user = User(username=username, password=hashed_password)
+        new_user = User(username=username, password=hashed_password, is_admin=is_admin)
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful! Please log in.')
+        
+        if is_admin:
+            flash('Registration successful! Registered as Club Administrator.')
+        else:
+            flash('Registration successful! Please log in.')
+            
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -151,6 +168,17 @@ def add_comment(suggestion_id):
         new_comment = Comment(body=body, suggestion_id=suggestion_id, user_id=current_user.id)
         db.session.add(new_comment)
         db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/update_status/<int:id>/<string:status>')
+@login_required
+def update_status(id, status):
+    if not current_user.is_admin:
+        flash('Unauthorized action.')
+        return redirect(url_for('index'))
+    suggestion = Suggestion.query.get_or_404(id)
+    suggestion.status = status
+    db.session.commit()
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
