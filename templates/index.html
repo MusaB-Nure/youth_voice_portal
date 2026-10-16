@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouthVoice Portal - Empowering Tomorrow's Leaders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    {% if current_user.is_authenticated %}
+        <!-- AUTHENTICATED MEMBER DASHBOARD -->
+        <nav class="navbar">
+            <a href="{{ url_for('index') }}" class="navbar-brand">⚡ YouthVoice Portal</a>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <span>
+                    Welcome, <strong>{{ current_user.username }}</strong>
+                    {% if current_user.is_admin %}
+                        <span style="background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 800; margin-left: 6px;">ADMIN</span>
+                    {% endif %}
+                </span>
+                <a href="{{ url_for('submit') }}" class="btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">+ New Concern</a>
+                <a href="{{ url_for('logout') }}" style="color: #ef4444; font-weight: 600; text-decoration: none;">Logout</a>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 20px;">Community Concerns & Initiatives</h2>
+            
+            <!-- CATEGORY FILTER BUTTONS -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px;">
+                <a href="{{ url_for('index') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if not selected_category or selected_category == 'All' else 'white' }}; color: {{ 'white' if not selected_category or selected_category == 'All' else '#334155' }};">
+                    All Topics
+                </a>
+                <a href="{{ url_for('index', category='Environment') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if selected_category == 'Environment' else 'white' }}; color: {{ 'white' if selected_category == 'Environment' else '#334155' }};">
+                    🌱 Environment
+                </a>
+                <a href="{{ url_for('index', category='Education') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if selected_category == 'Education' else 'white' }}; color: {{ 'white' if selected_category == 'Education' else '#334155' }};">
+                    📚 Education
+                </a>
+                <a href="{{ url_for('index', category='Technology') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if selected_category == 'Technology' else 'white' }}; color: {{ 'white' if selected_category == 'Technology' else '#334155' }};">
+                    💻 Technology
+                </a>
+                <a href="{{ url_for('index', category='Community') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if selected_category == 'Community' else 'white' }}; color: {{ 'white' if selected_category == 'Community' else '#334155' }};">
+                    🤝 Community
+                </a>
+                <a href="{{ url_for('index', category='Sports') }}" 
+                   style="padding: 8px 16px; font-size: 0.85rem; font-weight: 700; text-decoration: none; border-radius: 20px; border: 1px solid #cbd5e1; background: {{ '#4f46e5' if selected_category == 'Sports' else 'white' }}; color: {{ 'white' if selected_category == 'Sports' else '#334155' }};">
+                    ⚽ Sports
+                </a>
+            </div>
+
+            {% for suggestion in suggestions %}
+                <div style="background: white; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">{{ suggestion.title }}</h3>
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <span style="background: {% if suggestion.status == 'Completed' %}#dcfce7; color: #16a34a{% elif suggestion.status == 'In Progress' %}#e0f2fe; color: #0284c7{% else %}#fef9c3; color: #ca8a04{% endif %}; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                                {{ suggestion.status }}
+                            </span>
+                            <span style="background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                                {{ suggestion.category if suggestion.category else 'General' }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <p style="color: #475569; margin: 12px 0 16px 0; line-height: 1.5;">{{ suggestion.description }}</p>
+                    <small style="color: #94a3b8; font-weight: 600;">Submitted by: {{ suggestion.author.username if suggestion.author else 'Community Member' }}</small>
+                    
+                    {% if current_user.is_admin %}
+                        <div style="background: #f8fafc; padding: 10px 14px; border-radius: 10px; margin-top: 14px; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                            <span style="font-size: 0.8rem; font-weight: 700; color: #475569;">Admin Status Control:</span>
+                            <div style="display: flex; gap: 6px;">
+                                <a href="{{ url_for('update_status', id=suggestion.id, status='Under Review') }}" style="background: #fef9c3; color: #854d0e; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none;">Review</a>
+                                <a href="{{ url_for('update_status', id=suggestion.id, status='In Progress') }}" style="background: #e0f2fe; color: #0369a1; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none;">In Progress</a>
+                                <a href="{{ url_for('update_status', id=suggestion.id, status='Completed') }}" style="background: #dcfce7; color: #15803d; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-decoration: none;">Complete</a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <form action="{{ url_for('vote', id=suggestion.id) }}" method="POST" style="margin-top: 14px;">
+                        <button type="submit" class="btn-secondary" style="background: #f1f5f9; color: #334155; border: none; padding: 6px 14px; font-size: 0.85rem; cursor: pointer;">
+                            👍 Upvote ({{ suggestion.votes }})
+                        </button>
+                    </form>
+
+                    <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 20px 0;">
+
+                    <h4 style="font-size: 0.95rem; font-weight: 700; color: #334155; margin-bottom: 10px;">Member Discussion</h4>
+                    {% if suggestion.comments %}
+                        {% for comment in suggestion.comments %}
+                            <div style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #6366f1;">
+                                <p style="font-size: 0.9rem; color: #334155; margin: 0;">{{ comment.body }}</p>
+                                <small style="color: #64748b; font-size: 0.75rem;">— {{ comment.author.username }}</small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="font-size: 0.85rem; color: #94a3b8;">No responses yet. Be the first to share feedback!</p>
+                    {% endif %}
+
+                    <form action="{{ url_for('add_comment', suggestion_id=suggestion.id) }}" method="POST" style="margin-top: 12px; display: flex; gap: 8px;">
+                        <input type="text" name="body" placeholder="Write a constructive comment..." required class="form-control" style="padding: 8px 12px; font-size: 0.85rem;">
+                        <button type="submit" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; border: none; cursor: pointer;">Post</button>
+                    </form>
+                </div>
+            {% else %}
+                <p style="color: #64748b;">No issues found in this category yet!</p>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <!-- UNAUTHENTICATED VISITOR LANDING GATEWAY -->
+        <header class="landing-hero">
+            <div class="brand-badge">
+                <span>🌐 UNICEF Leadership Framework</span>
+            </div>
+            <h1 class="hero-title">YouthVoice Portal</h1>
+            <p class="hero-subtitle">
+                An inclusive civic engagement network empowering <strong>300+ youth club members</strong> to anonymously surface community challenges, vote on priorities, and spark grassroots change.
+            </p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('login') }}" class="btn-primary">🔐 Member Login</a>
+                <a href="{{ url_for('register') }}" class="btn-secondary">✨ Join Our Network</a>
+            </div>
+            <div>
+                <a href="{{ url_for('reset_password') }}" class="btn-text">Forgot your password? Reset here</a>
+            </div>
+        </header>
+
+        <section class="features-container">
+            <div class="feature-card">
+                <div class="feature-icon icon-blue">📣</div>
+                <h3>Amplifying Quiet Voices</h3>
+                <p>Safe, anonymous submission channels ensuring every young member's ideas are surfaced without fear of bias or judgment.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-purple">🗳️</div>
+                <h3>Democratic Upvoting</h3>
+                <p>Community-driven priority voting lets 300+ members vote on key local issues to direct club resources where needed most.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon icon-green">🤝</div>
+                <h3>Collaborative Solutions</h3>
+                <p>Structured discussion threads transform surfaced challenges into actionable youth-led community projects.</p>
+            </div>
+        </section>
+    {% endif %}
+
+</body>
+</html>
