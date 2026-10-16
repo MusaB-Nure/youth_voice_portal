@@ -2,47 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Submit Concern - YouthVoice Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Initiative - YouthVoice Portal</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="container" style="max-width: 500px; margin: auto; padding: 20px;">
-        <h2>Submit a Community Concern</h2>
-        
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul style="color: red; list-style-type: none; padding: 0;">
-              {% for message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+<body style="background: var(--bg-gradient); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
+    <div class="auth-box" style="max-width: 500px; width: 100%;">
+        <h2>Submit a Community Initiative 💡</h2>
+        <p class="subtitle">Share a challenge or proposal for your youth club to tackle.</p>
 
-        <form method="POST" action="{{ url_for('submit') }}">
-            <div style="margin-bottom: 15px;">
-                <label><strong>Issue Title:</strong></label><br>
-                <input type="text" name="title" required placeholder="e.g., Limited access to study space" style="width: 100%; padding: 8px; margin-top: 5px;">
+        <form method="POST">
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" name="title" required class="form-control" placeholder="e.g., Neighborhood Recycling Drive">
             </div>
-
-            <div style="margin-bottom: 15px;">
-                <label><strong>Category:</strong></label><br>
-                <select name="category" style="width: 100%; padding: 8px; margin-top: 5px;">
-                    <option value="Education & Resources">Education & Resources</option>
-                    <option value="Environment & Community">Environment & Community</option>
-                    <option value="Sports & Youth Events">Sports & Youth Events</option>
-                    <option value="General Initiative">General Initiative</option>
+            
+            <div class="form-group">
+                <label>Category Tag</label>
+                <select name="category" class="form-control" style="cursor: pointer;">
+                    <option value="Environment">🌱 Environment</option>
+                    <option value="Education">📚 Education & Skills</option>
+                    <option value="Technology">💻 Technology & Innovation</option>
+                    <option value="Community">🤝 Community Welfare</option>
+                    <option value="Sports">⚽ Sports & Recreation</option>
                 </select>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label><strong>Description & Details:</strong></label><br>
-                <textarea name="description" required rows="5" placeholder="Describe the problem and who it affects..." style="width: 100%; padding: 8px; margin-top: 5px;"></textarea>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" required class="form-control" rows="4" placeholder="Describe the issue and proposed solution in detail..."></textarea>
             </div>
 
-            <button type="submit" style="padding: 10px 20px; cursor: pointer; background-color: #3b7a78; color: white; border: none; border-radius: 4px; width: 100%;">Submit Issue</button>
+            <button type="submit" class="btn-primary" style="width: 100%; border: none; cursor: pointer; padding: 12px; margin-top: 10px;">Publish to Dashboard</button>
         </form>
-        <p style="margin-top: 15px;"><a href="{{ url_for('index') }}">← Back to Dashboard</a></p>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('index') }}" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">← Back to Dashboard</a>
+        </div>
     </div>
 </body>
 </html>
