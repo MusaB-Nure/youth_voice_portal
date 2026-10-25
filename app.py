@@ -59,7 +59,20 @@ def index():
         suggestions = Suggestion.query.filter_by(category=selected_category).order_by(Suggestion.votes.desc()).all()
     else:
         suggestions = Suggestion.query.order_by(Suggestion.votes.desc()).all()
-    return render_template('index.html', suggestions=suggestions, selected_category=selected_category)
+        
+    # Map categories to their corresponding background images inside static/images/
+    category_images = {
+        'Environment': 'Environment.jpg',
+        'Education': 'health.jpg',       
+        'Technology': 'Technology.jpg',
+        'Community': 'Community.jpg',
+        'Sports': 'Sports.jpg'
+    }
+    
+    # Pick the image based on category, default to Environment.jpg if none matches
+    bg_image = category_images.get(selected_category, 'Environment.jpg')
+
+    return render_template('index.html', suggestions=suggestions, selected_category=selected_category, bg_image=bg_image)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
